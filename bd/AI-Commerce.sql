@@ -1,115 +1,38 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 17.5
--- Dumped by pg_dump version 17.5
-
--- Started on 2025-07-16 16:19:45
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- TOC entry 218 (class 1259 OID 24581)
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
---
 
 CREATE TABLE public.users (
-    id integer NOT NULL,
-    email character varying(255) NOT NULL,
-    name character varying(255),
-    store_id integer NOT NULL,
-    access_token character varying(255) NOT NULL,
-    store_url character varying(255),
-    plan character varying(50) DEFAULT 'free'::character varying,
-    remaining_queries integer DEFAULT 100,
-    renovation_date date DEFAULT CURRENT_DATE,
-    creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    last_query timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    store_id INTEGER NOT NULL,
+    access_token VARCHAR(255) NOT NULL,
+    store_url VARCHAR(255),
+    plan VARCHAR(50) DEFAULT 'free',
+    remaining_queries INTEGER DEFAULT 100,
+    renovation_date DATE DEFAULT CURRENT_DATE,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_query TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
-
---
--- TOC entry 217 (class 1259 OID 24580)
--- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE public.users_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER SEQUENCE public.users_id_seq OWNER TO postgres;
-
---
--- TOC entry 4801 (class 0 OID 0)
--- Dependencies: 217
--- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
-
---
--- TOC entry 4641 (class 2604 OID 24584)
--- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
-
-
---
--- TOC entry 4795 (class 0 OID 24581)
--- Dependencies: 218
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.users (id, email, name, store_id, access_token, store_url, plan, remaining_queries, renovation_date, creation_date, last_query) FROM stdin;
-1	sumo@gmail.com	sumo	6469097	72556628907a582aed4f2f2970c84ea989dc1916	https://sumo8.mitiendanube.com	free	100	2025-08-16	2025-07-16 00:00:00	\N
-\.
-
-
---
--- TOC entry 4802 (class 0 OID 0)
--- Dependencies: 217
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('public.users_id_seq', 1, true);
-
-
---
--- TOC entry 4648 (class 2606 OID 24593)
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
-
--- Completed on 2025-07-16 16:19:46
-
---
--- PostgreSQL database dump complete
---
+INSERT INTO public.users (
+  email,
+  name,
+  store_id,
+  access_token,
+  store_url,
+  plan,
+  remaining_queries,
+  renovation_date,
+  creation_date
+) VALUES (
+  'sumo@gmail.com',
+  'sumo',
+  6469097,
+  '72556628907a582aed4f2f2970c84ea989dc1916',
+  'https://sumo8.mitiendanube.com',
+  'free',
+  100,
+  '2025-08-16',
+  '2025-07-16 00:00:00'
+);
 
