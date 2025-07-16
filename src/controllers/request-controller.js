@@ -9,16 +9,16 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-router.post('/gpt', async (req, res) => {
+router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5",
       messages: [
         {
           role: "system",
-          content: "Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube."
+          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Usa las funciones definidas solo y solo si es necesario usarlas, sino no las uses`
         },
         {
           role: "user",
@@ -27,17 +27,39 @@ router.post('/gpt', async (req, res) => {
       ],
       functions: [
         {
-          name: "ProductoInfo",
-          description: "Devuelve información de un producto de la tienda",
+        name: "ProductosInfo",
+        description: "Devuelve información de los productos de la tienda",
+        parameters: {
+          type: "object",
+          properties: {
+            id_user: {
+              type: "integer",
+              description: `el id del usuario es ${req.params.id_user}`
+            }
+          },
+          required: ["id_user"]
+        }
+      },
+        {
+          name: "Politicas",
+          description: "Devuelve información sobre la politica de envíos, devoluciones, despachos, etc.",
+        },
+        {
+          name: "EstadoCompra",
+          description: "Devuelve información sobre una compra en particular",
           parameters: {
             type: "object",
             properties: {
-              nombre: {
-                type: "string",
-                description: "Nombre del producto, por ejemplo 'zapatillas nike'"
+              num_compra: {
+                type: "integer", // mejor usar "integer" en lugar de "int"
+                description: "El número de la compra"
+              },
+              id_user: {
+                type: "integer",
+                description: "El id del usuario asociado a la cuenta"
               }
             },
-            required: ["nombre"]
+            required: ["num_compra", "id_user"] // solo 'num_compra' es obligatorio
           }
         }
       ],
