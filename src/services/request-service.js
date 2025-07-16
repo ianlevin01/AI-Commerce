@@ -6,10 +6,10 @@ export default class RequestService {
         const productos = await repo.Productos(id_user);
         return productos;
     }
-    EstadoCompra = async (num_compra,id_user) => {
-        console.log("hola")
+    EstadoCompra = async (id_user,id_order) => {
+        console.log("iduser",id_user,"idorder",id_order)
         const repo = new RequestRepository();
-        const objeto = await repo.EstadoCompra(num_compra);
+        const objeto = await repo.EstadoCompra(id_user, id_order);
         return objeto;
     }
     Politicas = async (id_user) => {

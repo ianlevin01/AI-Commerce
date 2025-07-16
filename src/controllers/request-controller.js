@@ -9,16 +9,21 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+router.post('/:id_user', async (req, res) => {
+  svc.EstadoCompra(req.params.id_user,100)
+
+})
+
 router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Usa las funciones definidas solo y solo si es necesario usarlas, sino no las uses`
+          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Usa las funciones definidas solo y solo si es necesario usarlas, sino no las uses. responde lo mas breve posible`
         },
         {
           role: "user",
@@ -50,16 +55,16 @@ router.post('/gpt/:id_user', async (req, res) => {
           parameters: {
             type: "object",
             properties: {
-              num_compra: {
-                type: "integer", // mejor usar "integer" en lugar de "int"
-                description: "El número de la compra"
-              },
               id_user: {
+                type: "integer", // mejor usar "integer" en lugar de "int"
+                description: `el id del usuario es ${req.params.id_user}`
+              },
+              id_order: {
                 type: "integer",
-                description: "El id del usuario asociado a la cuenta"
+                description: "es el numero de la compra, si no te lo dijo, pediselo"
               }
             },
-            required: ["num_compra", "id_user"] // solo 'num_compra' es obligatorio
+            required: ["id_user", "id_order"] 
           }
         }
       ],
