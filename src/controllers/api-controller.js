@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import ApiService from '../services/api-service.js';
+import axios from 'axios';
 
 const router = Router();
 const svc = new ApiService();
@@ -17,7 +18,7 @@ router.get('/oauth/callback', async (req, res) => {
     const { access_token, user_id } = response.data;
 
     // Guarda esto en la base de datos (user_id = store_id de la tienda)
-    state = await svc.saveUser(user_id, access_token);
+    let state = await svc.SaveUser(user_id, access_token);
 
     res.status(200).send('✅ Tienda conectada correctamente');
   } catch (error) {
@@ -25,3 +26,4 @@ router.get('/oauth/callback', async (req, res) => {
     res.status(500).send('Error al obtener token');
   }
 });
+export default router;

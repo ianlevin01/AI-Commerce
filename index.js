@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import RequestRouter from "./src/controllers/request-controller.js";
+import ApiRouter from "./src/controllers/api-controller.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/request', RequestRouter);
+app.use('/api', ApiRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));
