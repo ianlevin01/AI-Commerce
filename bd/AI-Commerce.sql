@@ -3,8 +3,6 @@ CREATE TABLE public.users (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     name VARCHAR(255),
-    store_id INTEGER NOT NULL,
-    access_token VARCHAR(255) NOT NULL,
     store_url VARCHAR(255),
     plan VARCHAR(50) DEFAULT 'free',
     remaining_queries INTEGER DEFAULT 100,
@@ -25,10 +23,8 @@ INSERT INTO public.users (
   renovation_date,
   creation_date
 ) VALUES (
-  'sumo@gmail.com',
+  'ianlevin01@gmail.com',
   'sumo',
-  6469097,
-  '72556628907a582aed4f2f2970c84ea989dc1916',
   'https://sumo8.mitiendanube.com',
   'free',
   100,

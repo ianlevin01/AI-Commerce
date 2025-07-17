@@ -54,9 +54,10 @@ export default class RequestRepository{
             await client.connect();
 
             const query = `
-                SELECT store_id, access_token
-                FROM users
+                UPDATE users
+                SET remaining_queries = remaining_queries - 1
                 WHERE id = $1
+                RETURNING store_id, access_token;
             `;
             const values = [id_user];
             const result = await client.query(query, values);
