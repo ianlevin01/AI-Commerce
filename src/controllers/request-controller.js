@@ -82,7 +82,7 @@ router.post('/gpt/:id_user', async (req, res) => {
         const result = await svc[name](...Object.values(args));
 
         const finalCompletion = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model: "gpt-4",
           messages: [
             { role: "system", content: "Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos." },
             { role: "user", content: userMessage },
