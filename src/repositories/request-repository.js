@@ -95,4 +95,38 @@ export default class RequestRepository{
             return null
         }
     }
+    StoreInfo = async (id_user) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT email, name, store_url
+                FROM users
+                WHERE id = $1
+            `;
+            const values = [id_user];
+            const result = await client.query(query, values);
+
+            await client.end();
+
+            if (result.rows.length === 0) {
+                throw new Error('No se encontró el usuario');
+            }
+
+            const { email, name, store_url } = result.rows[0];
+            objeto = {
+                "email":email,
+                "name": name,
+                "store_url": store_url
+            }
+
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    }
 }

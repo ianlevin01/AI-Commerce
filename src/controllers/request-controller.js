@@ -66,6 +66,20 @@ router.post('/gpt/:id_user', async (req, res) => {
             },
             required: ["id_user", "id_order"] 
           }
+        },
+        {
+          name: "StoreInfo",
+          description: "Devuelve información sobre la pagina, el mail, el nombre, la url",
+          parameters: {
+            type: "object",
+            properties: {
+              id_user: {
+                type: "integer", // mejor usar "integer" en lugar de "int"
+                description: `el id del usuario es ${req.params.id_user}`
+              }
+            },
+            required: ["id_user"] 
+          }
         }
       ],
       function_call: "auto"

@@ -15,8 +15,6 @@ CREATE TABLE public.users (
 INSERT INTO public.users (
   email,
   name,
-  store_id,
-  access_token,
   store_url,
   plan,
   remaining_queries,

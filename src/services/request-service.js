@@ -17,4 +17,9 @@ export default class RequestService {
         const objeto = await repo.Politicas();
         return objeto;
     }
+    StoreInfo = async (id_user) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.StoreInfo();
+        return objeto;
+    }
 }
