@@ -16,8 +16,11 @@ router.post('/:id_user', async (req, res) => {
 
 router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
-  let queries_available = await svc.QueriesAvailable(req.params.id_user)
-  if (queries_available){
+  const clientNumber = req.body.number;
+  const queries_available = await svc.QueriesAvailable(req.params.id_user)
+  const bot_response = await svc.BotResponse(req.params.id_user, clientNumber)
+
+  if (queries_available && bot_response){
     try {
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
@@ -80,6 +83,24 @@ router.post('/gpt/:id_user', async (req, res) => {
               }
             },
             required: ["id_user"] 
+          }
+        },
+        {
+          name: "HumanResponse",
+          description: "Llama a esta funcion si es necesaria la intervencion de un asesor humano para poder contestar al cliente",
+          parameters: {
+            type: "object",
+            properties: {
+              id_user: {
+                type: "integer", // mejor usar "integer" en lugar de "int"
+                description: `el id del usuario es ${req.params.id_user}`
+              },
+              client_number: {
+                type: "integer", // mejor usar "integer" en lugar de "int"
+                description: `el numero del cliente es ${clientNumber}`
+              }
+            },
+            required: ["id_user","client_number"] 
           }
         }
       ],

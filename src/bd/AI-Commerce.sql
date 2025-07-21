@@ -13,11 +13,21 @@ CREATE TABLE public.users (
     last_query TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE clients (
+  id SERIAL PRIMARY KEY,
+  id_user INT NOT NULL,
+  phone VARCHAR(20) NOT NULL,
+  needs_human BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE (id_user, phone)
+);
+
 
 
 INSERT INTO public.users (
   email,
   name,
+  password,
   store_url,
   plan,
   remaining_queries,
@@ -26,6 +36,7 @@ INSERT INTO public.users (
 ) VALUES (
   'ianlevin01@gmail.com',
   'sumo',
+  '$2b$10$.0mET8Fd6xt.W25Oz.hm1.EGVop4ScPBedoiN9FunFBsSo6vtuoEq'
   'https://sumo8.mitiendanube.com',
   'free',
   100,

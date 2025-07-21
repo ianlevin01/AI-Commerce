@@ -158,4 +158,76 @@ export default class RequestRepository{
 
         return objeto;
     };
+    HumanResponse = async (id_user, client_number) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                UPDATE clients
+                SET needs_human = true
+                WHERE id_user = $1 AND phone = $2;   
+            `;
+
+            const values = [
+                id_user,
+                client_number
+            ];
+            
+            const result = await client.query(query, values);
+            await client.end();
+
+            if (result.rowCount == 0) {
+                objeto = "Error en el sistema"
+                throw new Error('No se encontró el usuario o cliente');
+            }else{
+                objeto = "Cliente actualizado correctamente"
+            }
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    };
+    BotResponse = async (id_user, client_number) => {
+    let objeto = null;
+    const client = new Client(config);
+
+    try {
+        await client.connect();
+
+        // 1. Buscar si ya existe
+        let query = `
+            SELECT needs_human FROM clients
+            WHERE id_user = $1 AND phone = $2;
+        `;
+
+        const values = [id_user, client_number];
+        let result = await client.query(query, values);
+
+        // 2. Si no existe, insertarlo
+        if (result.rows.length === 0) {
+            query = `
+                INSERT INTO clients (id_user, phone, needs_human)
+                VALUES ($1, $2, false);
+            `;
+            await client.query(query, values);
+
+            // Ya que es nuevo, permitimos que el bot responda
+            objeto = true;
+        } else {
+            // 3. Si existe, devolvemos el inverso de needs_human
+            objeto = !result.rows[0].needs_human;
+        }
+
+    } catch (error) {
+        console.error('❌ Error en BotResponse:', error.message || error);
+    } finally {
+        await client.end(); // ✅ Cerramos al final, una sola vez
+    }
+
+    return objeto;
+};
 }

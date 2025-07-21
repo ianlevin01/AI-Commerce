@@ -26,4 +26,14 @@ export default class RequestService {
         const objeto = await repo.QueriesAvailable(id_user);
         return objeto;
     }
+    HumanResponse = async (id_user, client_number) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.HumanResponse(id_user, client_number);
+        return objeto;
+    }
+    BotResponse = async (id_user, client_number) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.BotResponse(id_user, client_number);
+        return objeto;
+    }
 }
