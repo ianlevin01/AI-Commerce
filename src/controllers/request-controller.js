@@ -16,8 +16,9 @@ router.post('/:id_user', async (req, res) => {
 
 router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
-
-  try {
+  let queries_available = await svc.QueriesAvailable(req.params.id_user)
+  if (queries_available){
+    try {
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -123,6 +124,11 @@ router.post('/gpt/:id_user', async (req, res) => {
     console.error('❌ Error al generar respuesta:', error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
+  }else{
+    res.status(200).send("No puedo contestar en estos momentos. Intente nuevamente mas tarde.");
+  } 
+
+  
 });
 
 export default router;

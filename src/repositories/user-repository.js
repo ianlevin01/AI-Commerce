@@ -77,5 +77,35 @@ export default class UserRepository{
 
         return objeto;
     };
+    GetUserId = async (id_user) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT * FROM users WHERE id = $1    
+            `;
+
+            const values = [
+                id_user
+            ];
+
+            const result = await client.query(query, values);
+
+            await client.end();
+
+            if (result.rows.length === 0) {
+                throw new Error('No se encontró el usuario');
+            }
+
+            objeto = result.rows[0];
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    };
     
 }

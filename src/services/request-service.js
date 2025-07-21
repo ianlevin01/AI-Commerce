@@ -7,19 +7,23 @@ export default class RequestService {
         return productos;
     }
     EstadoCompra = async (id_user,id_order) => {
-        console.log("iduser",id_user,"idorder",id_order)
         const repo = new RequestRepository();
         const objeto = await repo.EstadoCompra(id_user, id_order);
         return objeto;
     }
     Politicas = async (id_user) => {
         const repo = new RequestRepository();
-        const objeto = await repo.Politicas();
+        const objeto = await repo.Politicas(id_user);
         return objeto;
     }
     StoreInfo = async (id_user) => {
         const repo = new RequestRepository();
-        const objeto = await repo.StoreInfo();
+        const objeto = await repo.StoreInfo(id_user);
+        return objeto;
+    }
+    QueriesAvailable = async (id_user) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.QueriesAvailable(id_user);
         return objeto;
     }
 }

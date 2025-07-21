@@ -64,4 +64,22 @@ router.post('/login', async (req, res) => {
 
     return respuesta;
 });
+router.get('/:id_user', async (req, res) => {
+
+    let respuesta;
+    try {
+
+        const user = await svc.GetUserId(req.params.id_user);
+
+        if (user != null) {
+            respuesta = res.status(200).json(user);
+        } else {
+            respuesta = res.status(401).send('Error interno.');
+        }
+    } catch (error) {
+        respuesta = res.status(500).send('Error interno.');
+    }
+
+    return respuesta;
+});
 export default router;

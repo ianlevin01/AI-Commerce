@@ -129,4 +129,33 @@ export default class RequestRepository{
 
         return objeto;
     }
+    QueriesAvailable = async (id_user) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT remaining_queries FROM users WHERE id = $1    
+            `;
+
+            const values = [
+                id_user
+            ];
+            
+            const result = await client.query(query, values);
+            await client.end();
+
+            if (result.rows.length === 0) {
+                throw new Error('No se encontró el usuario');
+            }
+
+            objeto = result.rows[0].remaining_queries>0;
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    };
 }
