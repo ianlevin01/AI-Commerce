@@ -192,42 +192,110 @@ export default class RequestRepository{
         return objeto;
     };
     BotResponse = async (id_user, client_number) => {
-    let objeto = null;
-    const client = new Client(config);
+        let objeto = null;
+        const client = new Client(config);
 
-    try {
-        await client.connect();
+        try {
+            await client.connect();
 
-        // 1. Buscar si ya existe
-        let query = `
-            SELECT needs_human FROM clients
-            WHERE id_user = $1 AND phone = $2;
-        `;
-
-        const values = [id_user, client_number];
-        let result = await client.query(query, values);
-
-        // 2. Si no existe, insertarlo
-        if (result.rows.length === 0) {
-            query = `
-                INSERT INTO clients (id_user, phone, needs_human)
-                VALUES ($1, $2, false);
+            // 1. Buscar si ya existe
+            let query = `
+                SELECT needs_human FROM clients
+                WHERE id_user = $1 AND phone = $2;
             `;
-            await client.query(query, values);
 
-            // Ya que es nuevo, permitimos que el bot responda
-            objeto = true;
-        } else {
-            // 3. Si existe, devolvemos el inverso de needs_human
-            objeto = !result.rows[0].needs_human;
+            const values = [id_user, client_number];
+            let result = await client.query(query, values);
+
+            // 2. Si no existe, insertarlo
+            if (result.rows.length === 0) {
+                query = `
+                    INSERT INTO clients (id_user, phone, needs_human)
+                    VALUES ($1, $2, false);
+                `;
+                await client.query(query, values);
+
+                // Ya que es nuevo, permitimos que el bot responda
+                objeto = true;
+            } else {
+                // 3. Si existe, devolvemos el inverso de needs_human
+                objeto = !result.rows[0].needs_human;
+            }
+
+        } catch (error) {
+            console.error('❌ Error en BotResponse:', error.message || error);
+        } finally {
+            await client.end(); // ✅ Cerramos al final, una sola vez
         }
 
-    } catch (error) {
-        console.error('❌ Error en BotResponse:', error.message || error);
-    } finally {
-        await client.end(); // ✅ Cerramos al final, una sola vez
-    }
+        return objeto;
+    };
+    GuardarConversacion = async (id_user, client_number, message) => {
+        let objeto = null;
+        const client = new Client(config);
 
-    return objeto;
-};
+        try {
+            await client.connect();
+
+            const query = `
+                INSERT INTO conversations (client_id, message)
+                VALUES (
+                (SELECT id FROM clients WHERE phone = $1 AND id_user = $2),
+                $3
+                );   
+            `;
+
+            const values = [
+                client_number,
+                id_user,
+                message
+            ];
+            
+            const result = await client.query(query, values);
+            await client.end();
+
+            if (result.rowCount == 0) {
+                objeto = "Error en el sistema"
+                throw new Error('No se encontró el usuario o cliente');
+            }else{
+                objeto = "Cliente actualizado correctamente"
+            }
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    };
+    Conversaciones = async (user_id, client_number) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT message
+                FROM conversations
+                JOIN clients ON conversations.client_id = clients.id
+                WHERE clients.phone = $1 AND clients.id_user = $2   
+            `;
+
+            const values = [
+                client_number, user_id
+            ];
+            
+            const result = await client.query(query, values);
+            await client.end();
+
+            if (result.rowCount == 0) {
+                throw new Error('No se encontró el usuario o cliente');
+            }
+            objeto = result.rows
+
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    };
 }

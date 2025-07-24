@@ -22,6 +22,14 @@ CREATE TABLE clients (
   UNIQUE (id_user, phone)
 );
 
+CREATE TABLE conversations (
+  id SERIAL PRIMARY KEY,
+  client_id INT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
+);
+
 
 
 INSERT INTO public.users (
@@ -36,7 +44,7 @@ INSERT INTO public.users (
 ) VALUES (
   'ianlevin01@gmail.com',
   'sumo',
-  '$2b$10$.0mET8Fd6xt.W25Oz.hm1.EGVop4ScPBedoiN9FunFBsSo6vtuoEq'
+  '$2b$10$.0mET8Fd6xt.W25Oz.hm1.EGVop4ScPBedoiN9FunFBsSo6vtuoEq',
   'https://sumo8.mitiendanube.com',
   'free',
   100,

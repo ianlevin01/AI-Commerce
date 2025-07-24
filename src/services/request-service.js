@@ -1,6 +1,16 @@
 import 'dotenv/config'; 
 import RequestRepository from '../repositories/request-repository.js';
 export default class RequestService {
+    GuardarConversacion = async (user_id, client_number, client_message) => {
+        const repo = new RequestRepository();
+        const guardado = await repo.GuardarConversacion(user_id, client_number, client_message);
+        return guardado;
+    }
+    Conversaciones = async (user_id, client_number) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.Conversaciones(user_id, client_number);
+        return objeto;
+    }
     ProductosInfo = async (id_user) => {
         const repo = new RequestRepository();
         const productos = await repo.Productos(id_user);

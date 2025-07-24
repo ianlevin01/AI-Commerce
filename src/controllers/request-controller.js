@@ -17,139 +17,146 @@ router.post('/:id_user', async (req, res) => {
 router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
   const clientNumber = req.body.number;
-  const queries_available = await svc.QueriesAvailable(req.params.id_user)
-  const bot_response = await svc.BotResponse(req.params.id_user, clientNumber)
 
-  if (queries_available && bot_response){
+  const bot_response = await svc.BotResponse(req.params.id_user, clientNumber);
+  await svc.GuardarConversacion(req.params.id_user, clientNumber, userMessage);
+  const queries_available = await svc.QueriesAvailable(req.params.id_user);
+  const conversaciones = await svc.Conversaciones(req.params.id_user, clientNumber);
+
+  if (queries_available && bot_response) {
     try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
+      // 👉 Convertir historial a formato que entiende GPT
+      const historial = conversaciones.map(c => ({
+        role: "user",
+        content: c.message
+      }));
+
+      const baseMessages = [
         {
           role: "system",
-          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Usa las funciones definidas solo y solo si es necesario usarlas, sino no las uses. responde lo mas breve posible`
+          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Debes usar toda la información previa que el cliente haya dicho para responder sus preguntas. Responde siempre basado en el historial de mensajes anteriores que el usuario haya enviado. Sé breve y claro.`
         },
+        ...historial,
         {
           role: "user",
           content: userMessage
         }
-      ],
-      functions: [
-        {
-        name: "ProductosInfo",
-        description: "Devuelve información de los productos de la tienda",
-        parameters: {
-          type: "object",
-          properties: {
-            id_user: {
-              type: "integer",
-              description: `el id del usuario es ${req.params.id_user}`
+      ];
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: baseMessages,
+        functions: [
+          {
+            name: "ProductosInfo",
+            description: "Devuelve información de los productos de la tienda",
+            parameters: {
+              type: "object",
+              properties: {
+                id_user: {
+                  type: "integer",
+                  description: `el id del usuario es ${req.params.id_user}`
+                }
+              },
+              required: ["id_user"]
             }
           },
-          required: ["id_user"]
-        }
-      },
-        {
-          name: "Politicas",
-          description: "Devuelve información sobre la politica de envíos, devoluciones, despachos, etc.",
-        },
-        {
-          name: "EstadoCompra",
-          description: "Devuelve información sobre una compra en particular",
-          parameters: {
-            type: "object",
-            properties: {
-              id_user: {
-                type: "integer", // mejor usar "integer" en lugar de "int"
-                description: `el id del usuario es ${req.params.id_user}`
+          {
+            name: "Politicas",
+            description: "Devuelve información sobre la política de envíos, devoluciones, despachos, etc.",
+          },
+          {
+            name: "EstadoCompra",
+            description: "Devuelve información sobre una compra en particular",
+            parameters: {
+              type: "object",
+              properties: {
+                id_user: {
+                  type: "integer",
+                  description: `el id del usuario es ${req.params.id_user}`
+                },
+                id_order: {
+                  type: "integer",
+                  description: "es el número de la compra, si no te lo dijo, pedíselo"
+                }
               },
-              id_order: {
-                type: "integer",
-                description: "es el numero de la compra, si no te lo dijo, pediselo"
-              }
-            },
-            required: ["id_user", "id_order"] 
-          }
-        },
-        {
-          name: "StoreInfo",
-          description: "Devuelve información sobre la pagina, el mail, el nombre, la url",
-          parameters: {
-            type: "object",
-            properties: {
-              id_user: {
-                type: "integer", // mejor usar "integer" en lugar de "int"
-                description: `el id del usuario es ${req.params.id_user}`
-              }
-            },
-            required: ["id_user"] 
-          }
-        },
-        {
-          name: "HumanResponse",
-          description: "Llama a esta funcion si es necesaria la intervencion de un asesor humano para poder contestar al cliente",
-          parameters: {
-            type: "object",
-            properties: {
-              id_user: {
-                type: "integer", // mejor usar "integer" en lugar de "int"
-                description: `el id del usuario es ${req.params.id_user}`
-              },
-              client_number: {
-                type: "integer", // mejor usar "integer" en lugar de "int"
-                description: `el numero del cliente es ${clientNumber}`
-              }
-            },
-            required: ["id_user","client_number"] 
-          }
-        }
-      ],
-      function_call: "auto"
-    });
-
-    const choice = completion.choices[0];
-
-    if (choice.finish_reason === "function_call") {
-      const { name, arguments: argsJson } = choice.message.function_call;
-      const args = JSON.parse(argsJson);
-
-      // Verificamos si el método existe en el servicio
-      if (typeof svc[name] === "function") {
-        const result = await svc[name](...Object.values(args));
-
-        const finalCompletion = await openai.chat.completions.create({
-          model: "gpt-4",
-          messages: [
-            { role: "system", content: "Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos." },
-            { role: "user", content: userMessage },
-            {
-              role: "function",
-              name,
-              content: JSON.stringify(result)
+              required: ["id_user", "id_order"]
             }
-          ]
-        });
+          },
+          {
+            name: "StoreInfo",
+            description: "Devuelve información sobre la página, el mail, el nombre, la URL",
+            parameters: {
+              type: "object",
+              properties: {
+                id_user: {
+                  type: "integer",
+                  description: `el id del usuario es ${req.params.id_user}`
+                }
+              },
+              required: ["id_user"]
+            }
+          },
+          {
+            name: "HumanResponse",
+            description: "Llama a esta función si es necesaria la intervención de un asesor humano",
+            parameters: {
+              type: "object",
+              properties: {
+                id_user: {
+                  type: "integer",
+                  description: `el id del usuario es ${req.params.id_user}`
+                },
+                client_number: {
+                  type: "integer",
+                  description: `el número del cliente es ${clientNumber}`
+                }
+              },
+              required: ["id_user", "client_number"]
+            }
+          }
+        ],
+        function_call: "auto"
+      });
 
-        const reply = finalCompletion.choices[0].message.content;
-        res.json({ reply });
+      const choice = completion.choices[0];
+
+      if (choice.finish_reason === "function_call") {
+        const { name, arguments: argsJson } = choice.message.function_call;
+        const args = JSON.parse(argsJson);
+
+        if (typeof svc[name] === "function") {
+          const result = await svc[name](...Object.values(args));
+
+          const finalCompletion = await openai.chat.completions.create({
+            model: "gpt-4",
+            messages: [
+              ...baseMessages,
+              {
+                role: "function",
+                name,
+                content: JSON.stringify(result)
+              }
+            ]
+          });
+
+          const reply = finalCompletion.choices[0].message.content;
+          res.json({ reply });
+        } else {
+          res.status(400).json({ error: `La función ${name} no existe en el servicio.` });
+        }
       } else {
-        res.status(400).json({ error: `La función ${name} no existe en el servicio.` });
+        const reply = choice.message.content;
+        res.json({ reply });
       }
-    } else {
-      // GPT respondió directamente sin llamar a funciones
-      const reply = choice.message.content;
-      res.json({ reply });
+    } catch (error) {
+      console.error('❌ Error al generar respuesta:', error);
+      res.status(500).json({ error: "Error interno del servidor" });
     }
-
-  } catch (error) {
-    console.error('❌ Error al generar respuesta:', error);
-    res.status(500).json({ error: "Error interno del servidor" });
+  } else {
+    res.status(200).send("No puedo contestar en estos momentos. Intente nuevamente más tarde.");
   }
-  }else{
-    res.status(200).send("No puedo contestar en estos momentos. Intente nuevamente mas tarde.");
-  } 
-
-  
 });
+
 
 export default router;
