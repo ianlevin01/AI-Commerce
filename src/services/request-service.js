@@ -23,8 +23,8 @@ export default class RequestService {
     }
     Politicas = async (id_user) => {
         const repo = new RequestRepository();
-        const objeto = await repo.Politicas(id_user);
-        return objeto;
+        //const objeto = await repo.Politicas(id_user);
+        return "los envios se hacen por andreani, le va a llegar el codigo de seguimiento recien cuando sa despachado en el correo. si le llego un producto distintos al pedido se nececita la foto y el numero de pedido.";
     }
     StoreInfo = async (id_user) => {
         const repo = new RequestRepository();

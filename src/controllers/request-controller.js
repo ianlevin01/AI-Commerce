@@ -44,7 +44,7 @@ router.post('/gpt/:id_user', async (req, res) => {
       ];
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-4o",
         messages: baseMessages,
         functions: [
           {
@@ -129,7 +129,7 @@ router.post('/gpt/:id_user', async (req, res) => {
           const result = await svc[name](...Object.values(args));
 
           const finalCompletion = await openai.chat.completions.create({
-            model: "gpt-4",
+            model: "gpt-4o",
             messages: [
               ...baseMessages,
               {

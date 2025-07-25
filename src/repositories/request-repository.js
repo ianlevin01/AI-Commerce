@@ -80,15 +80,9 @@ export default class RequestRepository{
                 }
             });
 
-            const order = response.data;
+            const order = response.data[0];
 
-            const shipping_status = order[0].shipping_status;
-            const tracking_code = order[0].fulfillments?.[0]?.tracking_info?.code;
-
-            return {
-                "shipping_status": shipping_status,
-                "tracking_code": tracking_code
-            }
+            return order
 
         } catch (error) {
             console.error('Error:', error.message || error);
