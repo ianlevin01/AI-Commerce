@@ -82,4 +82,16 @@ router.get('/:id_user', async (req, res) => {
 
     return respuesta;
 });
+router.get('/prueba', async (req, res) => {
+
+    let respuesta;
+    try {
+        respuesta = res.status(200).send('Funciono');
+
+    } catch (error) {
+        respuesta = res.status(500).send('Error interno.');
+    }
+
+    return respuesta;
+});
 export default router;
