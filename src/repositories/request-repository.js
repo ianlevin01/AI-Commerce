@@ -319,7 +319,7 @@ export default class RequestRepository{
 
         return objeto;
     };
-    CustomResponses = async (id_user) => {
+    UserFaqs = async (id_user) => {
         let objeto = null;
         const client = new Client(config);
 
@@ -328,7 +328,7 @@ export default class RequestRepository{
 
             const query = `
                 SELECT question, answer
-                FROM custom_responses
+                FROM user_faqs
                 WHERE user_id = $1
             `;
             const values = [id_user];

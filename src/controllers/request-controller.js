@@ -22,7 +22,7 @@ router.post('/gpt/:id_user', async (req, res) => {
   await svc.GuardarConversacion(req.params.id_user, clientNumber, clientEmail, userMessage);
   const queries_available = await svc.QueriesAvailable(req.params.id_user);
   const conversaciones = await svc.Conversaciones(req.params.id_user, clientNumber, clientEmail);
-  const customExamples = await svc.CustomResponses(req.params.id_user);
+  const customExamples = await svc.UserFaqs(req.params.id_user);
 
   if (queries_available && bot_response) {
     try {
