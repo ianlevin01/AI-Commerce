@@ -31,7 +31,50 @@ CREATE TABLE conversations (
   FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
 );
 
+CREATE TABLE store_info (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  store_name TEXT,
+  description TEXT,
+  location TEXT,
+  contact_email TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
+CREATE TABLE store_policies (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  shipping_policy TEXT,
+  return_policy TEXT,
+  refund_policy TEXT,
+  payment_methods TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE shipping_methods (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  carrier_name TEXT,
+  pickup_available BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE custom_responses (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  question TEXT,
+  answer TEXT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE products (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  name TEXT,
+  description TEXT,
+  price INT,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
 INSERT INTO public.users (
   email,
