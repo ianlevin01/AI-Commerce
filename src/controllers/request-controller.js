@@ -68,8 +68,32 @@ router.post('/gpt/:id_user', async (req, res) => {
             }
           },
           {
-            name: "Politicas",
-            description: "Devuelve información sobre la política de envíos, devoluciones, despachos, etc.",
+            name: "StorePolicies",
+            description: "Devuelve información sobre las politicas de la tienda, envios, despachos, devoluciones, etc.",
+            parameters: {
+              type: "object",
+              properties: {
+                id_user: {
+                  type: "integer",
+                  description: `el id del usuario es ${req.params.id_user}`
+                }
+              },
+              required: ["id_user"]
+            }
+          },
+          {
+            name: "ShippingMethods",
+            description: "Devuelve información sobre la empresa de envios que usa, si se puede retirar y donde etc.",
+            parameters: {
+              type: "object",
+              properties: {
+                id_user: {
+                  type: "integer",
+                  description: `el id del usuario es ${req.params.id_user}`
+                }
+              },
+              required: ["id_user"]
+            }
           },
           {
             name: "EstadoCompra",

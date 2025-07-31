@@ -21,10 +21,10 @@ export default class RequestService {
         const objeto = await repo.EstadoCompra(id_user, id_order);
         return objeto;
     }
-    Politicas = async (id_user) => {
+    StorePolicies = async (id_user) => {
         const repo = new RequestRepository();
-        //const objeto = await repo.Politicas(id_user);
-        return "los envios se hacen por andreani, le va a llegar el codigo de seguimiento recien cuando sa despachado en el correo. si le llego un producto distintos al pedido se nececita la foto y el numero de pedido.";
+        const objeto = await repo.StorePolicies(id_user);
+        return objeto
     }
     StoreInfo = async (id_user) => {
         const repo = new RequestRepository();
@@ -49,7 +49,11 @@ export default class RequestService {
     CustomResponses = async (id_user) => {
         const repo = new RequestRepository();
         const objeto = await repo.CustomResponses(id_user);
-        console.log(objeto)
+        return objeto;
+    }
+    ShippingMethods = async (id_user) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.ShippingMethods(id_user);
         return objeto;
     }
 }

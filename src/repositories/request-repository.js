@@ -11,40 +11,55 @@ export default class RequestRepository{
         try {
             await client.connect();
 
-            const query = `
+            const userQuery = `
                 SELECT store_id, access_token
                 FROM users
                 WHERE id = $1
             `;
-            const values = [id_user];
-            const result = await client.query(query, values);
+            const userResult = await client.query(userQuery, [id_user]);
 
-            await client.end();
-
-            if (result.rows.length === 0) {
+            if (userResult.rows.length === 0) {
                 throw new Error('No se encontró el usuario');
             }
 
-            const { shop_id, access_token } = result.rows[0];
+            const { store_id, access_token } = userResult.rows[0];
 
-            // 📦 Llamada a la API de Tiendanube
-            const url = `https://api.tiendanube.com/2025-03/${shop_id}/products`;
+            // 🔁 Llamada a la API de Tiendanube
+            const url = `https://api.tiendanube.com/2025-03/${store_id}/products`;
 
-            // ✅ Corrección: el header correcto es "Authorization"
-            const response = await axios.get(url, {
-                headers: {
-                    'Authentication': `bearer ${access_token}`
-                }
-            });
+            try {
+                const response = await axios.get(url, {
+                    headers: {
+                        'Authorization': `bearer ${access_token}`, // 🛠 corregido: era 'Authentication'
+                        'User-Agent': 'TuApp (tuemail@tudominio.com)' // necesario para Tiendanube
+                    }
+                });
 
-            objeto = response.data;
+                objeto = response.data;
+            } catch (apiError) {
+                console.warn('⚠️ No se pudo obtener productos desde Tiendanube. Usando base de datos local.');
+
+                // ⛑️ Fallback: productos locales desde la base
+                const localQuery = `
+                    SELECT id, name, description, price
+                    FROM products
+                    WHERE user_id = $1
+                `;
+                const localResult = await client.query(localQuery, [id_user]);
+
+                objeto = localResult.rows;
+            }
+
+            await client.end();
 
         } catch (error) {
-            console.error('Error:', error.message || error);
+            console.error('❌ Error:', error.message || error);
+            await client.end();
         }
 
         return objeto;
-    }
+    };
+
 
     EstadoCompra = async (id_user, order_id) => {
         let objeto = null;
@@ -97,9 +112,9 @@ export default class RequestRepository{
             await client.connect();
 
             const query = `
-                SELECT email, name, store_url
-                FROM users
-                WHERE id = $1
+                SELECT *
+                FROM store_info
+                WHERE user_id = $1
             `;
             const values = [id_user];
             const result = await client.query(query, values);
@@ -110,12 +125,7 @@ export default class RequestRepository{
                 throw new Error('No se encontró el usuario');
             }
 
-            const { email, name, store_url } = result.rows[0];
-            objeto = {
-                "email":email,
-                "name": name,
-                "store_url": store_url
-            }
+            objeto = result.rows[0];
 
         } catch (error) {
             console.error('Error:', error.message || error);
@@ -331,6 +341,64 @@ export default class RequestRepository{
             }
 
             objeto = result.rows
+
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    }
+    ShippingMethods = async (id_user) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT *
+                FROM shipping_methods
+                WHERE user_id = $1
+            `;
+            const values = [id_user];
+            const result = await client.query(query, values);
+
+            await client.end();
+
+            if (result.rows.length === 0) {
+                throw new Error('No se encontró el usuario');
+            }
+
+            objeto = result.rows[0];
+
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    }
+    StorePolicies = async (id_user) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT *
+                FROM store_policies
+                WHERE user_id = $1
+            `;
+            const values = [id_user];
+            const result = await client.query(query, values);
+
+            await client.end();
+
+            if (result.rows.length === 0) {
+                throw new Error('No se encontró el usuario');
+            }
+
+            objeto = result.rows[0];
 
         } catch (error) {
             console.error('Error:', error.message || error);
