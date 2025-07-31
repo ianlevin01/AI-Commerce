@@ -1,14 +1,14 @@
 import 'dotenv/config'; 
 import RequestRepository from '../repositories/request-repository.js';
 export default class RequestService {
-    GuardarConversacion = async (user_id, client_number, client_message) => {
+    GuardarConversacion = async (user_id, client_number, client_email, client_message) => {
         const repo = new RequestRepository();
-        const guardado = await repo.GuardarConversacion(user_id, client_number, client_message);
+        const guardado = await repo.GuardarConversacion(user_id, client_number, client_email, client_message);
         return guardado;
     }
-    Conversaciones = async (user_id, client_number) => {
+    Conversaciones = async (user_id, client_number, client_email) => {
         const repo = new RequestRepository();
-        const objeto = await repo.Conversaciones(user_id, client_number);
+        const objeto = await repo.Conversaciones(user_id, client_number, client_email);
         return objeto;
     }
     ProductosInfo = async (id_user) => {
@@ -36,14 +36,14 @@ export default class RequestService {
         const objeto = await repo.QueriesAvailable(id_user);
         return objeto;
     }
-    HumanResponse = async (id_user, client_number) => {
+    HumanResponse = async (id_user, client_number, client_email) => {
         const repo = new RequestRepository();
-        const objeto = await repo.HumanResponse(id_user, client_number);
+        const objeto = await repo.HumanResponse(id_user, client_number, client_email);
         return objeto;
     }
-    BotResponse = async (id_user, client_number) => {
+    BotResponse = async (id_user, client_number, client_email) => {
         const repo = new RequestRepository();
-        const objeto = await repo.BotResponse(id_user, client_number);
+        const objeto = await repo.BotResponse(id_user, client_number, client_email);
         return objeto;
     }
 }

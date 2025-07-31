@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import WebhookService from '../services/webhook-service.js';
+//import WebhookService from '../services/webhook-service.js';
 import axios from 'axios';
 
 const router = Router();
-const svc = new UserService();
+//const svc = new WebhookService();
 router.post('/store/redact', async (req, res) => {
 
     let respuesta;
@@ -28,7 +28,7 @@ router.post('/customers/redact', async (req, res) => {
 
     return respuesta;
 });
-router.post('/custome/redact', async (req, res) => {
+router.post('/customers/data_request', async (req, res) => {
 
     let respuesta;
     try {

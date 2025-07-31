@@ -16,12 +16,13 @@ router.post('/:id_user', async (req, res) => {
 
 router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
-  const clientNumber = req.body.number;
+  const clientNumber = req.body.number || null;
+  const clientEmail = req.body.email || null;
 
-  const bot_response = await svc.BotResponse(req.params.id_user, clientNumber);
-  await svc.GuardarConversacion(req.params.id_user, clientNumber, userMessage);
+  const bot_response = await svc.BotResponse(req.params.id_user, clientNumber, clientEmail); 
+  await svc.GuardarConversacion(req.params.id_user, clientNumber, clientEmail, userMessage);
   const queries_available = await svc.QueriesAvailable(req.params.id_user);
-  const conversaciones = await svc.Conversaciones(req.params.id_user, clientNumber);
+  const conversaciones = await svc.Conversaciones(req.params.id_user, clientNumber, clientEmail);
 
   if (queries_available && bot_response) {
     try {
@@ -110,9 +111,13 @@ router.post('/gpt/:id_user', async (req, res) => {
                 client_number: {
                   type: "integer",
                   description: `el número del cliente es ${clientNumber}`
+                },
+                client_email: {
+                  type: "string",
+                  description: `el email del cliente es ${clientEmail}`
                 }
               },
-              required: ["id_user", "client_number"]
+              required: ["id_user", "client_number", "client_email"]
             }
           }
         ],

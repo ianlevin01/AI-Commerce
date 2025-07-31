@@ -16,7 +16,8 @@ CREATE TABLE public.users (
 CREATE TABLE clients (
   id SERIAL PRIMARY KEY,
   id_user INT NOT NULL,
-  phone VARCHAR(20) NOT NULL,
+  phone VARCHAR(20),
+  email VARCHAR(50),
   needs_human BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
   UNIQUE (id_user, phone)

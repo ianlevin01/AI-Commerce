@@ -3,6 +3,7 @@ import cors from "cors";
 import RequestRouter from "./src/controllers/request-controller.js";
 import ApiRouter from "./src/controllers/api-controller.js";
 import UserRouter from "./src/controllers/user-controller.js";
+import WebhookRouter from "./src/controllers/webhook-controller.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -23,6 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/request', RequestRouter);
 app.use('/api', ApiRouter);
 app.use('/user', UserRouter);
+app.use('/webhook', WebhookRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));
