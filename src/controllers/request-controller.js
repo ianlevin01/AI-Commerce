@@ -31,7 +31,7 @@ router.post('/gpt/:id_user', async (req, res) => {
         role: "user",
         content: c.message
       }));
-      const ejemplos = customExamples.flatMap(example => ([
+      const ejemplos = (customExamples || []).flatMap(example => ([
         { role: "user", content: example.question },
         { role: "assistant", content: example.answer }
       ]));
