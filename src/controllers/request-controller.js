@@ -10,8 +10,7 @@ const openai = new OpenAI({
 });
 
 router.post('/:id_user', async (req, res) => {
-  svc.EstadoCompra(req.params.id_user,100)
-
+  let precargadas = svc.CustomResponses(req.params.id_user)
 })
 
 router.post('/gpt/:id_user', async (req, res) => {
@@ -23,6 +22,7 @@ router.post('/gpt/:id_user', async (req, res) => {
   await svc.GuardarConversacion(req.params.id_user, clientNumber, clientEmail, userMessage);
   const queries_available = await svc.QueriesAvailable(req.params.id_user);
   const conversaciones = await svc.Conversaciones(req.params.id_user, clientNumber, clientEmail);
+  const customExamples = await svc.CustomResponses(req.params.id_user);
 
   if (queries_available && bot_response) {
     try {
@@ -31,12 +31,17 @@ router.post('/gpt/:id_user', async (req, res) => {
         role: "user",
         content: c.message
       }));
+      const ejemplos = customExamples.flatMap(example => ([
+        { role: "user", content: example.question },
+        { role: "assistant", content: example.answer }
+      ]));
 
       const baseMessages = [
         {
           role: "system",
-          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Debes usar toda la información previa que el cliente haya dicho para responder sus preguntas. Responde siempre basado en el historial de mensajes anteriores que el usuario haya enviado. Sé breve y claro.`
+          content: `Sos un bot de atención al cliente para WhatsApp que responde sobre productos, pedidos y envíos en una tienda online Tiendanube. Debes usar toda la información previa que el cliente haya dicho para responder sus preguntas. Responde siempre basado en el historial de mensajes anteriores que el usuario haya enviado y las conversaciones precargadas. Si detectas que el mensaje se parece a algun mensaje precargado responde de la forma indicada. Sé breve y claro.`
         },
+        ...ejemplos,
         ...historial,
         {
           role: "user",

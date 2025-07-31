@@ -46,4 +46,10 @@ export default class RequestService {
         const objeto = await repo.BotResponse(id_user, client_number, client_email);
         return objeto;
     }
+    CustomResponses = async (id_user) => {
+        const repo = new RequestRepository();
+        const objeto = await repo.CustomResponses(id_user);
+        console.log(objeto)
+        return objeto;
+    }
 }

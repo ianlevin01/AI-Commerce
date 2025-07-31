@@ -309,4 +309,33 @@ export default class RequestRepository{
 
         return objeto;
     };
+    CustomResponses = async (id_user) => {
+        let objeto = null;
+        const client = new Client(config);
+
+        try {
+            await client.connect();
+
+            const query = `
+                SELECT question, answer
+                FROM custom_responses
+                WHERE user_id = $1
+            `;
+            const values = [id_user];
+            const result = await client.query(query, values);
+
+            await client.end();
+
+            if (result.rows.length === 0) {
+                throw new Error('No se encontró el usuario');
+            }
+
+            objeto = result.rows
+
+        } catch (error) {
+            console.error('Error:', error.message || error);
+        }
+
+        return objeto;
+    }
 }
