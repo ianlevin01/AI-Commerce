@@ -59,7 +59,7 @@ CREATE TABLE shipping_methods (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE custom_responses (
+CREATE TABLE user_faqs (
   id SERIAL PRIMARY KEY,
   user_id INT NOT NULL,
   question TEXT,
