@@ -12,6 +12,17 @@ const openai = new OpenAI({
 router.post('/:id_user', async (req, res) => {
   let precargadas = svc.CustomResponses(req.params.id_user)
 })
+const verifyToken = process.env.VERIFY_TOKEN;
+app.get('/gpt/:iduser', (req, res) => {
+  const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
+
+  if (mode === 'subscribe' && token === verifyToken) {
+    console.log('WEBHOOK VERIFIED');
+    res.status(200).send(challenge);
+  } else {
+    res.status(403).end();
+  }
+});
 
 router.post('/gpt/:id_user', async (req, res) => {
   const userMessage = req.body.text;
