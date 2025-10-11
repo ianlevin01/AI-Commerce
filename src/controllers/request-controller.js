@@ -13,7 +13,7 @@ router.post('/:id_user', async (req, res) => {
   let precargadas = svc.CustomResponses(req.params.id_user)
 })
 const verifyToken = process.env.VERIFY_TOKEN;
-app.get('/gpt/:iduser', (req, res) => {
+router.get('/gpt/:iduser', (req, res) => {
   const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
 
   if (mode === 'subscribe' && token === verifyToken) {
