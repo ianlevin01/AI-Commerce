@@ -24,6 +24,29 @@ router.get('/gpt/:iduser', (req, res) => {
   }
 });
 
+async function sendWhatsAppMessage(to, message) {
+  try {
+    const res = await axios.post(
+      `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
+      {
+        messaging_product: "whatsapp",
+        to: to,
+        type: "text",
+        text: { body: message },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${META_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("✅ Mensaje enviado a WhatsApp:", res.data);
+  } catch (err) {
+    console.error("❌ Error al enviar mensaje a WhatsApp:", err.response?.data || err.message);
+  }
+}
+
 router.post('/gpt/:id_user', async (req, res) => {
   const message = req.body.value.messages[0];
   console.log(message)
@@ -188,7 +211,9 @@ router.post('/gpt/:id_user', async (req, res) => {
           });
 
           const reply = finalCompletion.choices[0].message.content;
-          res.json({ reply });
+          await sendWhatsAppMessage(clientNumber, reply);
+
+          res.sendStatus(200);  
         } else {
           res.status(400).json({ error: `La función ${name} no existe en el servicio.` });
         }
