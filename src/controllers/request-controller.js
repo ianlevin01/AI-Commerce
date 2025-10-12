@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import OpenAI from 'openai';
 import RequestService from '../services/request-service.js';
+import axios from 'axios';
 
 const router = Router();
 const svc = new RequestService();
@@ -27,7 +28,7 @@ router.get('/gpt/:iduser', (req, res) => {
 async function sendWhatsAppMessage(to, message) {
   try {
     const res = await axios.post(
-      `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
+      `https://graph.facebook.com/v22.0/${process.env.PHONE_NUMBER_ID}/messages`,
       {
         messaging_product: "whatsapp",
         to: to,
@@ -36,7 +37,7 @@ async function sendWhatsAppMessage(to, message) {
       },
       {
         headers: {
-          Authorization: `Bearer ${META_TOKEN}`,
+          Authorization: `Bearer ${process.env.META_TOKEN}`,
           "Content-Type": "application/json",
         },
       }
@@ -219,7 +220,9 @@ router.post('/gpt/:id_user', async (req, res) => {
         }
       } else {
         const reply = choice.message.content;
-        res.json({ reply });
+        await sendWhatsAppMessage(clientNumber, reply);
+
+        res.sendStatus(200); 
       }
     } catch (error) {
       console.error('❌ Error al generar respuesta:', error);
