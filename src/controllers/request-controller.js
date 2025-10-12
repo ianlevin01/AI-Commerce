@@ -52,7 +52,7 @@ function normalizarNumero(wa_id) {
   // Argentina móvil
   if (wa_id.startsWith("54911")) {
     // Convierte 54911XXXXXXX → 541115XXXXXXX
-    return "541115" + wa_id.slice(7);
+    return "541115" + wa_id.slice(5);
   }
   // Argentina fuera de CABA
   if (wa_id.startsWith("549")) {
@@ -67,6 +67,7 @@ function normalizarNumero(wa_id) {
 router.post('/gpt/:id_user', async (req, res) => {
   const message = req.body.entry[0].changes[0].value.messages[0];
   const clientNumber = normalizarNumero(message.from)
+  console.log(clientNumber)
   const userMessage = message.text.body;
   const clientEmail = req.body.email || null;
 
