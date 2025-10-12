@@ -48,8 +48,8 @@ async function sendWhatsAppMessage(to, message) {
 }
 
 router.post('/gpt/:id_user', async (req, res) => {
+  console.log(req.body)
   const message = req.body.value.messages[0];
-  console.log(message)
   const clientNumber = message.from;
   const userMessage = message.text.body;
   const clientEmail = req.body.email || null;
