@@ -48,10 +48,25 @@ async function sendWhatsAppMessage(to, message) {
   }
 }
 
+function normalizarNumero(wa_id) {
+  // Argentina móvil
+  if (wa_id.startsWith("54911")) {
+    // Convierte 54911XXXXXXX → 541115XXXXXXX
+    return "541115" + wa_id.slice(7);
+  }
+  // Argentina fuera de CABA
+  if (wa_id.startsWith("549")) {
+    // Ejemplo: 549351XXXXXXX → 543515XXXXXXX
+    const codigoArea = wa_id.slice(2, 5); // 351
+    return "54" + codigoArea + "15" + wa_id.slice(5);
+  }
+  // Otros países, sin cambios
+  return wa_id;
+}
+
 router.post('/gpt/:id_user', async (req, res) => {
   const message = req.body.entry[0].changes[0].value.messages[0];
-  console.log(message.from)
-  const clientNumber = message.from;
+  const clientNumber = normalizarNumero(message.from)
   const userMessage = message.text.body;
   const clientEmail = req.body.email || null;
 
